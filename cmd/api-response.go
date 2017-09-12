@@ -277,7 +277,19 @@ func getLocation(r *http.Request) string {
 
 // getObjectLocation gets the relative URL for an object
 func getObjectLocation(bucketName string, key string) string {
-	return "/" + bucketName + "/" + key
+       var location = url.URL{
+               Host:   globalMinioHost,
+               Port:   globalMinioPort,
+               Scheme: "http",
+       }
+       if globalMinioAddr != "" {
+               if globalIsSSL {
+                       location.Scheme = "https"
+               }
+               location.Path = pathJoin(bucketName, key)
+               return location.String()
+       }
+       return slashSeparator + pathJoin(bucketName, key)
 }
 
 // generates ListBucketsResponse from array of BucketInfo which can be
